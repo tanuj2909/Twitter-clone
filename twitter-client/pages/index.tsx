@@ -5,6 +5,8 @@ import { IoSearch } from "react-icons/io5";
 import { SlEnvolope } from "react-icons/sl";
 import { FaRegBookmark, FaPlus } from "react-icons/fa6";
 import FeedCard from "@/components/FeedCard";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import { useCallback } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -41,6 +43,11 @@ const SidebarMenuItems: TwitterSidebarButton[] = [
 ]
 
 export default function Home() {
+
+  const handelLoginWithGoogle = useCallback((cred: CredentialResponse) => {
+
+  },[])
+
   return (
     <div>
       <div className="grid grid-cols-12 h-screen w-screen px-56">
@@ -75,7 +82,14 @@ export default function Home() {
           <FeedCard />
           <FeedCard />
         </div>
-        <div className="col-span-3"></div>
+        <div className="col-span-3">
+          <div className="m-5 p-5 bg-neutral-800 rounded-lg">
+            <div className="text-center m-2 text-lg text-neutral-200">Login / Register</div>
+            <div className=" flex justify-center">
+              <GoogleLogin onSuccess={(cred) => console.log(cred)}/>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
