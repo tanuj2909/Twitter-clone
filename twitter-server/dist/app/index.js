@@ -16,6 +16,7 @@ exports.initServer = void 0;
 const server_1 = require("@apollo/server");
 const express4_1 = require("@apollo/server/express4");
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const user_1 = require("./user");
 function initServer() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -33,7 +34,7 @@ function initServer() {
             },
         });
         yield server.start();
-        app.use('/graphql', express_1.default.json(), (0, express4_1.expressMiddleware)(server));
+        app.use('/graphql', (0, cors_1.default)(), express_1.default.json(), (0, express4_1.expressMiddleware)(server));
         return app;
     });
 }

@@ -7,6 +7,9 @@ import { FaRegBookmark, FaPlus } from "react-icons/fa6";
 import FeedCard from "@/components/FeedCard";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useCallback } from "react";
+import toast from "react-hot-toast";
+import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
+import { graphqlClient } from "@/clients/api";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -44,8 +47,13 @@ const SidebarMenuItems: TwitterSidebarButton[] = [
 
 export default function Home() {
 
-  const handelLoginWithGoogle = useCallback((cred: CredentialResponse) => {
+  const handelLoginWithGoogle = useCallback(async (cred: CredentialResponse) => {
+      const googleToken = cred.credential
 
+      if(!googleToken) return toast.error('Google token not found!');
+      const {} = await graphqlClient.request(verifyUserGoogleTokenQuery, { token: googleToken})
+
+      toast.success('Verified Successfully!');
   },[])
 
   return (
@@ -86,7 +94,7 @@ export default function Home() {
           <div className="m-5 p-5 bg-neutral-800 rounded-lg">
             <div className="text-center m-2 text-lg text-neutral-200">Login / Register</div>
             <div className=" flex justify-center">
-              <GoogleLogin onSuccess={(cred) => console.log(cred)}/>
+              <GoogleLogin onSuccess={handelLoginWithGoogle}/>
             </div>
           </div>
         </div>

@@ -8,11 +8,46 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvers = void 0;
+const axios_1 = __importDefault(require("axios"));
+const db_1 = require("../../lib/db");
+const jwt_1 = __importDefault(require("../../services/jwt"));
 const queries = {
     verifyGoogleToken: (parent, { token }) => __awaiter(void 0, void 0, void 0, function* () {
-        return token;
+        const googleToken = token;
+        const googleOauthURL = new URL('https://oauth2.googleapis.com/tokeninfo');
+        googleOauthURL.searchParams.set('id_token', googleToken);
+        const { data } = yield axios_1.default.get(googleOauthURL.toString(), {
+            responseType: 'json'
+        });
+        const existingUser = yield db_1.db.user.findUnique({
+            where: {
+                email: data.email
+            }
+        });
+        if (!existingUser) {
+            yield db_1.db.user.create({
+                data: {
+                    firstName: data.given_name,
+                    email: data.email,
+                    lastName: data.family_name,
+                    profileImageUrl: data.picture,
+                }
+            });
+        }
+        const user = yield db_1.db.user.findUnique({
+            where: {
+                email: data.email
+            }
+        });
+        if (!user)
+            throw new Error('User not found');
+        const userToken = yield jwt_1.default.generateTokenForUser(user);
+        return userToken;
     })
 };
 exports.resolvers = { queries };
