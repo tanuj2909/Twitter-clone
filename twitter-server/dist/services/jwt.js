@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jwt = __importStar(require("jsonwebtoken"));
-class JWT {
+class JWTService {
     static generateTokenForUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
             const payload = {
@@ -50,4 +50,4 @@ class JWT {
         });
     }
 }
-exports.default = JWT;
+exports.default = JWTService;

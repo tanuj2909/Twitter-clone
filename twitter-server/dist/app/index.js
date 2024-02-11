@@ -21,6 +21,7 @@ const user_1 = require("./user");
 function initServer() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = (0, express_1.default)();
+        app.use((0, cors_1.default)());
         const server = new server_1.ApolloServer({
             typeDefs: `
             ${user_1.User.types}
@@ -34,7 +35,7 @@ function initServer() {
             },
         });
         yield server.start();
-        app.use('/graphql', (0, cors_1.default)(), express_1.default.json(), (0, express4_1.expressMiddleware)(server));
+        app.use('/graphql', express_1.default.json(), (0, express4_1.expressMiddleware)(server));
         return app;
     });
 }

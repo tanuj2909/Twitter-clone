@@ -1,6 +1,6 @@
 import axios from "axios";
 import { db } from "../../lib/db";
-import JWT from "../../services/jwt";
+import JWTService from "../../services/jwt";
 
 interface GoogleTokenResponse {
     iss?: string;
@@ -58,7 +58,7 @@ const queries = {
         if(!user) throw new Error('User not found');
         
 
-        const userToken = await JWT.generateTokenForUser(user);
+        const userToken = await JWTService.generateTokenForUser(user);
 
         return userToken;
     }

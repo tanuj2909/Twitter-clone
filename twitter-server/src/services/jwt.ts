@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import { db } from "../lib/db";
 import * as jwt from 'jsonwebtoken';
-class JWT {
+class JWTService {
     public static async generateTokenForUser(user: User) {
 
         const payload = {
@@ -17,4 +17,4 @@ class JWT {
         }
     }
 }
-export default JWT;
+export default JWTService;

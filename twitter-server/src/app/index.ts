@@ -7,6 +7,8 @@ import { User } from './user'
 
 export async function initServer() {
     const app = express();
+
+    app.use(cors());
     const server = new ApolloServer({
         typeDefs: `
             ${User.types}
@@ -25,7 +27,7 @@ export async function initServer() {
 
     await server.start();
 
-    app.use('/graphql',cors<cors.CorsRequest>(), express.json(), expressMiddleware(server));
+    app.use('/graphql', express.json(), expressMiddleware(server));
 
     return app;
 }

@@ -51,9 +51,11 @@ export default function Home() {
       const googleToken = cred.credential
 
       if(!googleToken) return toast.error('Google token not found!');
-      const {} = await graphqlClient.request(verifyUserGoogleTokenQuery, { token: googleToken})
+      const {verifyGoogleToken} = await graphqlClient.request(verifyUserGoogleTokenQuery, { token: googleToken})
 
       toast.success('Verified Successfully!');
+      
+      if(verifyGoogleToken) window.localStorage.setItem('twt_token', verifyGoogleToken)
   },[])
 
   return (
