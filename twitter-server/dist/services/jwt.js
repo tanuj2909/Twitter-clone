@@ -22,32 +22,34 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const jwt = __importStar(require("jsonwebtoken"));
 class JWTService {
     static generateTokenForUser(user) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const payload = {
-                id: user === null || user === void 0 ? void 0 : user.id,
-                email: user === null || user === void 0 ? void 0 : user.email
-            };
+        const payload = {
+            id: user === null || user === void 0 ? void 0 : user.id,
+            email: user === null || user === void 0 ? void 0 : user.email
+        };
+        if (process.env.JWT_SECRET) {
+            const token = jwt.sign(payload, process.env.JWT_SECRET);
+            return token;
+        }
+        else {
+            console.error('Error: JWT_SECRET is not defined in the environment variables.');
+        }
+    }
+    static decodeToken(token) {
+        try {
             if (process.env.JWT_SECRET) {
-                const token = jwt.sign(payload, process.env.JWT_SECRET);
-                return token;
+                return jwt.verify(token, process.env.JWT_SECRET);
             }
             else {
                 console.error('Error: JWT_SECRET is not defined in the environment variables.');
             }
-        });
+        }
+        catch (error) {
+            return null;
+        }
     }
 }
 exports.default = JWTService;

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { db } from "../../lib/db";
 import JWTService from "../../services/jwt";
+import { GraphqlContext } from "../../interfaces";
 
 interface GoogleTokenResponse {
     iss?: string;
@@ -61,7 +62,20 @@ const queries = {
         const userToken = await JWTService.generateTokenForUser(user);
 
         return userToken;
-    }
+    },
+
+    getCurrentUser: async (parent: any, args: any, ctx: GraphqlContext) => {
+        const id = ctx.user?.id;
+        if (!id) return null;
+
+        const user = await db.user.findUnique({
+            where: {
+                id
+            }
+        })
+
+        return user;
+      },
 }
 
 export const resolvers = { queries };
