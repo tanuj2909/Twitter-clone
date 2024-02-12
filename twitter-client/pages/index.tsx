@@ -10,6 +10,9 @@ import { useCallback } from "react";
 import toast from "react-hot-toast";
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import { graphqlClient } from "@/clients/api";
+import { useCurrentUser } from "@/hooks/user";
+import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -47,6 +50,10 @@ const SidebarMenuItems: TwitterSidebarButton[] = [
 
 export default function Home() {
 
+  const {user} = useCurrentUser();
+
+  const queryClient = useQueryClient();
+
   const handelLoginWithGoogle = useCallback(async (cred: CredentialResponse) => {
       const googleToken = cred.credential
 
@@ -56,12 +63,14 @@ export default function Home() {
       toast.success('Verified Successfully!');
       
       if(verifyGoogleToken) window.localStorage.setItem('twt_token', verifyGoogleToken)
+
+      await queryClient.invalidateQueries({ queryKey: ['current-user'] })
   },[])
 
   return (
     <div>
       <div className="grid grid-cols-12 h-screen w-screen px-56">
-        <div className="col-span-3 pt-8">
+        <div className="col-span-3 pt-8 relative">
           <div className="h-fit w-fit hover:bg-gray-800 rounded-full p-2 flex justify-center items-center cursor-pointer transition-all">
             <FaXTwitter className="h-10 w-10"/>
           </div>
@@ -77,6 +86,16 @@ export default function Home() {
               <span className="text-4xl rounded-full px-6 2xl:hidden">+</span>
             </button>
           </div>
+          {user && user.profileImageUrl && <div className=" flex absolute bottom-14 gap-2 items-center bg-neutral-800 hover:bg-neutral-700 py-2 pr-10 pl-2 rounded-full">
+            <Image 
+              src={user.profileImageUrl} 
+              alt='user-image' 
+              width={50} 
+              height={50}
+              className="rounded-full "
+            />
+            <div className="text-xl">{user.firstName} {user?.lastName}</div>
+          </div>}
         </div>
         <div className="col-span-6 border-x-2 border-neutral-800 h-screen overflow-auto scrollbar-style">
           <FeedCard />
@@ -93,12 +112,12 @@ export default function Home() {
           <FeedCard />
         </div>
         <div className="col-span-3">
-          <div className="m-5 p-5 bg-neutral-800 rounded-lg">
+          {!user && <div className="m-5 p-5 bg-neutral-800 rounded-lg">
             <div className="text-center m-2 text-lg text-neutral-200">Login / Register</div>
             <div className=" flex justify-center">
               <GoogleLogin onSuccess={handelLoginWithGoogle}/>
             </div>
-          </div>
+          </div>}
         </div>
       </div>
     </div>
