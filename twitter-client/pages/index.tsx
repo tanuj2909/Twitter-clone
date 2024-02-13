@@ -13,6 +13,7 @@ import { graphqlClient } from "@/clients/api";
 import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
+import TweetCard from "@/components/TweetCard";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -98,6 +99,7 @@ export default function Home() {
           </div>}
         </div>
         <div className="col-span-6 border-x-2 border-neutral-800 h-screen overflow-auto scrollbar-style">
+          {user && <TweetCard user={user}/>}
           <FeedCard />
           <FeedCard />
           <FeedCard />
