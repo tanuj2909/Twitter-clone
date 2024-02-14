@@ -1,25 +1,32 @@
+import { Tweet } from "@/gql/graphql";
 import Image from "next/image";
 import { BiMessageRounded } from "react-icons/bi";
 import { FaRetweet, FaRegHeart, FaRegBookmark } from "react-icons/fa6";
 import { LuUpload } from "react-icons/lu";
-const FeedCard = () => {
+
+interface FeedCardProps {
+    data: Tweet
+}
+
+const FeedCard: React.FC<FeedCardProps> = (props) => {
+
+    const {data} = props;
+
     return (
         <div className="border-t border-gray-800 p-5 hover:bg-neutral-950 transition-all">
             <div className="grid grid-cols-12">
                 <div className="col-span-1">
-                    <Image 
-                        src={'https://avatars.githubusercontent.com/u/107452346?s=400&u=35ac6724a673a8965e095872ee96423f53ca57be&v=4'} 
+                    {data.author && data.author.profileImageUrl &&<Image 
+                        src={data.author?.profileImageUrl} 
                         alt='user-image'
                         width={50}
                         height={50}
                         className="rounded-full"
-                    />
+                    />}
                 </div>
                 <div className="col-span-11">
-                    <h5>Tanuj</h5>
-                    <p>
-                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum, praesentium adipisci voluptatibus libero minima numquam laboriosam dolor tempore, veritatis deleniti, sint illum aspernatur quam ipsa maiores! Similique iste obcaecati adipisci.
-                    </p>
+                    <h5>{data.author?.firstName} {data.author?.lastName}</h5>
+                    <p>{data.content}</p>
                     <div className="flex justify-evenly mt-5 text-xl text-neutral-700">
                         <div className="hover:text-[#1d9bf0] hover:bg-[#1d9bf0]/10 p-2 rounded-full">
                             <BiMessageRounded />

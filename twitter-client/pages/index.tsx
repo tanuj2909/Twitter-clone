@@ -14,6 +14,8 @@ import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import TweetCard from "@/components/TweetCard";
+import { useGetAllTweets } from "@/hooks/tweets";
+import { Tweet } from "@/gql/graphql";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -52,6 +54,8 @@ const SidebarMenuItems: TwitterSidebarButton[] = [
 export default function Home() {
 
   const {user} = useCurrentUser();
+
+  const {tweets = []} = useGetAllTweets();
 
   const queryClient = useQueryClient();
 
@@ -100,18 +104,9 @@ export default function Home() {
         </div>
         <div className="col-span-6 border-x-2 border-neutral-800 h-screen overflow-auto scrollbar-style">
           {user && <TweetCard user={user}/>}
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
+          {
+            tweets?.map(tweet => tweet ? <FeedCard key={tweet?.id} data={tweet as Tweet}/> : null)
+          }
         </div>
         <div className="col-span-3">
           {!user && <div className="m-5 p-5 bg-neutral-800 rounded-lg">

@@ -1,10 +1,24 @@
 import { User } from "@/gql/graphql";
+import { useCreateTweet } from "@/hooks/tweets";
 import Image from "next/image"
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { CiImageOn } from "react-icons/ci"
 
 
 const TweetCard = ({ user }: { user: User}) => {
+
+    const [content, setContent] = useState('');
+
+    const { mutate } = useCreateTweet();
+
+    const handleCreateTweet = useCallback(() => {
+        mutate({
+            content,
+        })
+        
+    }, [content, mutate])
+
+    
 
     const handleSelectImage = useCallback(() => {
         const input = document.createElement('input');
@@ -12,6 +26,7 @@ const TweetCard = ({ user }: { user: User}) => {
         input.setAttribute('accept', 'image/*');
         input.click();
     }, [])
+
 
     return(
         <div>
@@ -27,13 +42,22 @@ const TweetCard = ({ user }: { user: User}) => {
                     />}
                 </div>
                 <div className="col-span-11">
-                    <textarea className="w-full border-b bg-transparent text-xl p-4 border-b-gray-700 focus:outline-none" rows={2} placeholder="What is happening?!" />
+                    <textarea 
+                        className="w-full border-b bg-transparent text-xl p-4 border-b-gray-700 focus:outline-none" 
+                        rows={2} 
+                        placeholder="What is happening?!"
+                        value={content}
+                        onChange={e => setContent(e.target.value )} 
+                    />
                     <div className="flex justify-between">
                         <div className="text-2xl p-2 text-[#1d9bf0] hover:bg-[#1d9bf0]/10  w-fit rounded-full mt-2">
                         <CiImageOn  onClick={handleSelectImage}/>
                         </div>
                         <div>
-                            <button className="bg-[#1d9bf0] rounded-full mt-2 px-4 py-2 text-xl" >Post</button>
+                            <button 
+                                className="bg-[#1d9bf0] rounded-full mt-2 px-4 py-2 text-xl"
+                                onClick={handleCreateTweet} 
+                            >Post</button>
                         </div>
                     </div>
                 </div>
