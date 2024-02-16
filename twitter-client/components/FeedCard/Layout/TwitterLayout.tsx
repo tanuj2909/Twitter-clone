@@ -6,7 +6,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import Image from "next/image";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { graphqlClient } from "@/clients/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import toast from "react-hot-toast";
@@ -19,36 +19,45 @@ interface TwitterLayoutProps {
 interface TwitterSidebarButton {
     title: string;
     icon: React.ReactNode;
+    link: string;
 }
 
-const SidebarMenuItems: TwitterSidebarButton[] = [
-    {
-      title: 'Home',
-      icon: <GoHomeFill />
-    },
-    {
-      title: 'Search',
-      icon: <IoSearch />
-    },
-    {
-      title: 'Notification',
-      icon: <GoBell />
-    },
-    {
-      title: 'Message',
-      icon: <SlEnvolope />
-    },
-    {
-      title: 'Bookmarks',
-      icon: <FaRegBookmark />
-    },
-    {
-      title: 'Profile',
-      icon: <GoPerson />
-    }
-]
 
 const TwitterLayout:React.FC<TwitterLayoutProps> = ( props ) => {
+
+    const SidebarMenuItems: TwitterSidebarButton[] = useMemo(() => [
+        {
+          title: 'Home',
+          icon: <GoHomeFill />,
+          link: "/"
+        },
+        {
+          title: 'Search',
+          icon: <IoSearch />,
+          link: "/"
+        },
+        {
+          title: 'Notification',
+          icon: <GoBell />,
+          link: "/"
+        },
+        {
+          title: 'Message',
+          icon: <SlEnvolope />,
+          link: "/"
+        },
+        {
+          title: 'Bookmarks',
+          icon: <FaRegBookmark />,
+          link: "/"
+        },
+        {
+          title: 'Profile',
+          icon: <GoPerson />,
+          link: "/"
+        }
+    ], [])
+    
 
     const queryClient = useQueryClient();
 
@@ -72,12 +81,12 @@ const TwitterLayout:React.FC<TwitterLayoutProps> = ( props ) => {
         <div className="grid grid-cols-12 h-screen w-screen sm:px-26">
             <div className="col-span-3 pt-8 flex justify-end relative">
                     <div>
-                        <div className="h-fit w-fit hover:bg-gray-800 rounded-full p-2 flex justify-center items-center cursor-pointer transition-all">
+                        <div className="h-fit w-fit hover:bg-neutral-800 rounded-full p-2 flex justify-center items-center cursor-pointer transition-all">
                             <FaXTwitter className="h-10 w-10"/>
                         </div>
                         <div className="mt-4 text-2xl">
                             <ul>
-                            {SidebarMenuItems.map(item => <li key={item.title} className="flex justify-start items-center gap-6 hover:bg-gray-800 rounded-full p-4 w-fit cursor-pointer">
+                            {SidebarMenuItems.map(item => <li key={item.title} className="flex justify-start items-center gap-6 hover:bg-neutral-800 rounded-full p-4 w-fit cursor-pointer">
                                 <span className="text-4xl">{item.icon}</span>
                                 <span className="hidden 2xl:block">{item.title}</span>
                             </li>)}

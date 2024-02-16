@@ -30,7 +30,7 @@ const TweetCard = ({ user }: { user: User}) => {
 
     return(
         <div>
-            <div className="border-t border-gray-800 p-5 hover:bg-neutral-950 transition-all">
+            <div className="border-t border-neutral-800 p-5 hover:bg-neutral-950 transition-all">
                 <div className="grid grid-cols-12">
                 <div className="col-span-1">
                     {user && user.profileImageUrl && <Image 
@@ -43,7 +43,7 @@ const TweetCard = ({ user }: { user: User}) => {
                 </div>
                 <div className="col-span-11">
                     <textarea 
-                        className="w-full border-b bg-transparent text-xl p-4 border-b-gray-700 focus:outline-none" 
+                        className="w-full border-b bg-transparent text-xl p-4 border-b-neutral-700 focus:outline-none" 
                         rows={2} 
                         placeholder="What is happening?!"
                         value={content}

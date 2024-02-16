@@ -13,7 +13,7 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
     const {data} = props;
 
     return (
-        <div className="border-t border-gray-800 p-5 hover:bg-neutral-950 transition-all">
+        <div className="border-t border-neutral-800 p-5 hover:bg-neutral-950 transition-all">
             <div className="grid grid-cols-12">
                 <div className="col-span-1">
                     {data.author && data.author.profileImageUrl &&<Image 
@@ -24,9 +24,9 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
                         className="rounded-full"
                     />}
                 </div>
-                <div className="col-span-11">
-                    <h5>{data.author?.firstName} {data.author?.lastName}</h5>
-                    <p>{data.content}</p>
+                <div className="col-span-11 ml-2">
+                    <h5 className="font-semibold">{data.author?.firstName} {data.author?.lastName}</h5>
+                    <p className=" text-neutral-400">{data.content}</p>
                     <div className="flex justify-evenly mt-5 text-xl text-neutral-700">
                         <div className="hover:text-[#1d9bf0] hover:bg-[#1d9bf0]/10 p-2 rounded-full">
                             <BiMessageRounded />
