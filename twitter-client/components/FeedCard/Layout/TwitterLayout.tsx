@@ -11,6 +11,7 @@ import { graphqlClient } from "@/clients/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import toast from "react-hot-toast";
 import { useCurrentUser } from "@/hooks/user";
+import Link from "next/link";
 
 interface TwitterLayoutProps {
     children: React.ReactNode
@@ -24,6 +25,10 @@ interface TwitterSidebarButton {
 
 
 const TwitterLayout:React.FC<TwitterLayoutProps> = ( props ) => {
+
+    const queryClient = useQueryClient();
+
+    const {user} = useCurrentUser();
 
     const SidebarMenuItems: TwitterSidebarButton[] = useMemo(() => [
         {
@@ -54,14 +59,12 @@ const TwitterLayout:React.FC<TwitterLayoutProps> = ( props ) => {
         {
           title: 'Profile',
           icon: <GoPerson />,
-          link: "/"
+          link: `/${user?.id}`
         }
-    ], [])
+    ], [user?.id])
     
 
-    const queryClient = useQueryClient();
-
-    const {user} = useCurrentUser();
+   
 
     const handelLoginWithGoogle = useCallback(async (cred: CredentialResponse) => {
         const googleToken = cred.credential
@@ -86,10 +89,20 @@ const TwitterLayout:React.FC<TwitterLayoutProps> = ( props ) => {
                         </div>
                         <div className="mt-4 text-2xl">
                             <ul>
-                            {SidebarMenuItems.map(item => <li key={item.title} className="flex justify-start items-center gap-6 hover:bg-neutral-800 rounded-full p-4 w-fit cursor-pointer">
-                                <span className="text-4xl">{item.icon}</span>
-                                <span className="hidden 2xl:block">{item.title}</span>
-                            </li>)}
+                                {SidebarMenuItems.map(item => (
+                                    <li 
+                                        key={item.title}
+                                    >   
+                                        <Link 
+                                            href={item.link}
+                                            className="flex justify-start items-center gap-6 hover:bg-neutral-800 rounded-full p-4 w-fit cursor-pointer"
+                                        >
+                                            <span className="text-4xl">{item.icon}</span>
+                                            <span className="hidden 2xl:block">{item.title}</span>
+                                        </Link>
+                                    </li>
+                                    
+                                ))}
                             </ul>
                             <button className="bg-[#1d9bf0] rounded-full mt-8 mr-4 py-4">
                             <span className=" px-24 hidden 2xl:inline">Post</span>
@@ -112,10 +125,10 @@ const TwitterLayout:React.FC<TwitterLayoutProps> = ( props ) => {
                     </div>}
                     
             </div>
-            <div className="col-span-9 sm:col-span-5 border-x-2 border-neutral-800 h-screen overflow-auto scrollbar-style">
+            <div className="col-span-9 md:col-span-5 border-x-2 border-neutral-800 h-screen overflow-auto scrollbar-style">
                 {props.children}
             </div>
-            <div className="hidden sm:col-span-3">
+            <div className="hidden sm:inline col-span-3">
             {!user && <div className="m-5 p-5 bg-neutral-800 rounded-lg">
                 <div className="text-center m-2 text-lg text-neutral-200">Login / Register</div>
                 <div className=" flex justify-center">

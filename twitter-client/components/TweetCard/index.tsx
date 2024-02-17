@@ -1,11 +1,14 @@
 import { User } from "@/gql/graphql";
 import { useCreateTweet } from "@/hooks/tweets";
+import { useCurrentUser } from "@/hooks/user";
 import Image from "next/image"
 import { useCallback, useState } from "react";
 import { CiImageOn } from "react-icons/ci"
 
 
-const TweetCard = ({ user }: { user: User}) => {
+const TweetCard = () => {
+
+    const { user } = useCurrentUser();
 
     const [content, setContent] = useState('');
 

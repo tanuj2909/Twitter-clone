@@ -1,5 +1,6 @@
 import { Tweet } from "@/gql/graphql";
 import Image from "next/image";
+import Link from "next/link";
 import { BiMessageRounded } from "react-icons/bi";
 import { FaRetweet, FaRegHeart, FaRegBookmark } from "react-icons/fa6";
 import { LuUpload } from "react-icons/lu";
@@ -25,7 +26,9 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
                     />}
                 </div>
                 <div className="col-span-11 ml-2">
-                    <h5 className="font-semibold">{data.author?.firstName} {data.author?.lastName}</h5>
+                    <Link href={`/${data.author?.id}`}>
+                        <h5 className="font-semibold hover:underline">{data.author?.firstName} {data.author?.lastName}</h5>
+                    </Link>
                     <p className=" text-neutral-400">{data.content}</p>
                     <div className="flex justify-evenly mt-5 text-xl text-neutral-700">
                         <div className="hover:text-[#1d9bf0] hover:bg-[#1d9bf0]/10 p-2 rounded-full">
