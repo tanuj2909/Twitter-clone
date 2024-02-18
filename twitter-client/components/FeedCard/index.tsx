@@ -30,6 +30,24 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
                         <h5 className="font-semibold hover:underline">{data.author?.firstName} {data.author?.lastName}</h5>
                     </Link>
                     <p className=" text-neutral-400">{data.content}</p>
+                    <div>
+                        { data.imageURL && <a
+                            href={data.imageURL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="relative rounded-md mt-2 overflow-hidden flex items-center bg-secondary h-64 w-64"
+                        >
+                            <Image 
+                                src={data.imageURL}
+                                alt="image"
+                                layout="fill"
+                                objectFit="cover"
+                                className="rounded-sm"
+                            /> 
+                        </a>}
+                        
+                    </div>
+                    
                     <div className="flex justify-evenly mt-5 text-xl text-neutral-700">
                         <div className="hover:text-[#1d9bf0] hover:bg-[#1d9bf0]/10 p-2 rounded-full">
                             <BiMessageRounded />

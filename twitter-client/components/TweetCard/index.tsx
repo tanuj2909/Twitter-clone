@@ -1,8 +1,12 @@
+import { graphqlClient } from "@/clients/api";
 import { User } from "@/gql/graphql";
+import { getSignedUrlForTweetQuery } from "@/graphql/query/tweet";
 import { useCreateTweet } from "@/hooks/tweets";
 import { useCurrentUser } from "@/hooks/user";
+import axios from "axios";
 import Image from "next/image"
 import { useCallback, useState } from "react";
+import toast from "react-hot-toast";
 import { CiImageOn } from "react-icons/ci"
 
 
@@ -11,24 +15,66 @@ const TweetCard = () => {
     const { user } = useCurrentUser();
 
     const [content, setContent] = useState('');
+    const [imageUrl, setImageUrl] = useState('');
 
     const { mutate } = useCreateTweet();
 
     const handleCreateTweet = useCallback(() => {
+        if(content == "" && imageUrl == "" ) {
+            toast.error("Can not post empty tweet!");
+            return;
+        }
         mutate({
             content,
+            imageURL: imageUrl
         })
-        
-    }, [content, mutate])
 
-    
+        setContent('');
+        setImageUrl('');
+        
+    }, [content, mutate, imageUrl])
+
+    const handleInputChangeFile =  useCallback((input: HTMLInputElement) => {
+        return async (event: Event) => {
+            event.preventDefault();
+            const file: File | null | undefined = input.files?.item(0);
+            if(!file) return;
+
+
+            const {getSignedUrlForTweet} = await graphqlClient.request(getSignedUrlForTweetQuery, {
+                imageName: file.name.split('.')[0],
+                imageType: file.type.split('/')[1]
+            })
+
+            if(getSignedUrlForTweet) {
+                toast.loading('Uploading...', { id: 'upload' });
+                await axios.put(getSignedUrlForTweet, file, {
+                    headers: {
+                        'Content-Type': file.type
+                    }
+                })
+
+                toast.success('Upload complete!', { id: 'upload' });
+
+                const url = new URL(getSignedUrlForTweet);
+
+                setImageUrl(`${url.origin}${url.pathname}`);
+            }
+        }
+    }, [])
+
 
     const handleSelectImage = useCallback(() => {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
         input.setAttribute('accept', 'image/*');
+
+
+        input.addEventListener('change', handleInputChangeFile(input))
+
         input.click();
-    }, [])
+
+    }, [handleInputChangeFile])
 
 
     return(
@@ -52,6 +98,19 @@ const TweetCard = () => {
                         value={content}
                         onChange={e => setContent(e.target.value )} 
                     />
+                    { imageUrl && <a
+                        href={imageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-md"
+                    >
+                        <Image
+                            src={imageUrl}
+                            alt="tweet-image"
+                            width={300}
+                            height={300}
+                        />
+                    </a>}
                     <div className="flex justify-between">
                         <div className="text-2xl p-2 text-[#1d9bf0] hover:bg-[#1d9bf0]/10  w-fit rounded-full mt-2">
                         <CiImageOn  onClick={handleSelectImage}/>
