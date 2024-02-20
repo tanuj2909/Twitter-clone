@@ -23,6 +23,22 @@ const queries = {
     getUserById: async (parent: any, { id }: { id: string }, ctx: GraphqlContext) => UserService.getUserById(id)
 }
 
+const mutations = {
+    followUser: async(parent: any, {to}: {to: string}, ctx: GraphqlContext) => {
+        if(!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
+
+        await UserService.followUser(ctx.user.id, to);
+        return true;
+    },
+
+    unfollowUser: async(parent: any, {to}: {to: string}, ctx: GraphqlContext) => {
+        if(!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
+
+        await UserService.unfollowUser(ctx.user.id, to);
+        return true;
+    }
+}
+
 const extraResolvers = {
     User: {
         tweets: (parent: User) => db.tweet.findMany({
@@ -31,8 +47,36 @@ const extraResolvers = {
                     id: parent.id
                 }
             }
-        })
+        }),
+        followers: async(parent: User) => {
+            const result = await db.follows.findMany({
+                where: {
+                    following: {
+                        id: parent.id
+                    }
+                },
+                include: {
+                    follower: true
+                }
+            })
+
+            return result.map((e) => e.follower)
+        },
+        following: async(parent:User) => {
+            const result = await db.follows.findMany({
+                where: {
+                    follower: {
+                        id: parent.id 
+                    }
+                },
+                include: {
+                    following: true
+                }
+            })
+
+            return result.map((e) => e.following)
+        }
     }
 }
 
-export const resolvers = { queries, extraResolvers };
+export const resolvers = { queries, extraResolvers, mutations };
