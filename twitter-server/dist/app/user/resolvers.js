@@ -30,6 +30,20 @@ const queries = {
     }),
     getUserById: (parent, { id }, ctx) => __awaiter(void 0, void 0, void 0, function* () { return user_1.default.getUserById(id); })
 };
+const mutations = {
+    followUser: (parent, { to }, ctx) => __awaiter(void 0, void 0, void 0, function* () {
+        if (!ctx.user || !ctx.user.id)
+            throw new Error("Unauthenticated");
+        yield user_1.default.followUser(ctx.user.id, to);
+        return true;
+    }),
+    unfollowUser: (parent, { to }, ctx) => __awaiter(void 0, void 0, void 0, function* () {
+        if (!ctx.user || !ctx.user.id)
+            throw new Error("Unauthenticated");
+        yield user_1.default.unfollowUser(ctx.user.id, to);
+        return true;
+    })
+};
 const extraResolvers = {
     User: {
         tweets: (parent) => db_1.db.tweet.findMany({
@@ -38,7 +52,33 @@ const extraResolvers = {
                     id: parent.id
                 }
             }
+        }),
+        followers: (parent) => __awaiter(void 0, void 0, void 0, function* () {
+            const result = yield db_1.db.follows.findMany({
+                where: {
+                    following: {
+                        id: parent.id
+                    }
+                },
+                include: {
+                    follower: true
+                }
+            });
+            return result.map((e) => e.follower);
+        }),
+        following: (parent) => __awaiter(void 0, void 0, void 0, function* () {
+            const result = yield db_1.db.follows.findMany({
+                where: {
+                    follower: {
+                        id: parent.id
+                    }
+                },
+                include: {
+                    following: true
+                }
+            });
+            return result.map((e) => e.following);
         })
     }
 };
-exports.resolvers = { queries, extraResolvers };
+exports.resolvers = { queries, extraResolvers, mutations };

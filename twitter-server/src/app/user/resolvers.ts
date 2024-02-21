@@ -28,6 +28,7 @@ const mutations = {
         if(!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
 
         await UserService.followUser(ctx.user.id, to);
+
         return true;
     },
 
@@ -35,6 +36,7 @@ const mutations = {
         if(!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
 
         await UserService.unfollowUser(ctx.user.id, to);
+        
         return true;
     }
 }
