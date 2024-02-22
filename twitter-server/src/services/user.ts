@@ -71,7 +71,17 @@ class UserService {
         })
     }
 
-    public static followUser(from: string, to: string) {
+    public static async followUser(from: string, to: string) {
+        const existingUser =  await db.follows.findUnique({
+            where: {
+                followerId_followingId: {
+                    followerId: from,
+                    followingId: to
+                }
+            }
+        })
+
+        if(existingUser) return { "data": { "followUser": true }}
         return db.follows.create({
             data: {
                 follower: { 
@@ -88,7 +98,18 @@ class UserService {
         })
     }
 
-    public static unfollowUser(from: string, to: string) {
+    public static async unfollowUser(from: string, to: string) {
+        const existingUser =  await db.follows.findUnique({
+            where: {
+                followerId_followingId: {
+                    followerId: from,
+                    followingId: to
+                }
+            }
+        })
+
+        if(!existingUser)  return { "data": { "unfollowUser": true }}
+
         return db.follows.delete({
             where: {
                 followerId_followingId: {

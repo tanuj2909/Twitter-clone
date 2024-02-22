@@ -1,6 +1,6 @@
 import FeedCard from "@/components/FeedCard";
 import TwitterLayout from "@/components/FeedCard/Layout/TwitterLayout";
-import { Tweet, User } from "@/gql/graphql";
+import { GetUserByIdQuery, Tweet, User } from "@/gql/graphql";
 import { useCurrentUser } from "@/hooks/user";
 import type { GetServerSideProps, NextPage } from "next";
 import Image from "next/image";
@@ -10,7 +10,7 @@ import { graphqlClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/query/user";
 import { useCallback, useMemo } from "react";
 import { followUserMutation, unfollowUserMutation } from "@/graphql/mutation/user";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface ServerProps {
     user?: User
@@ -25,9 +25,13 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
     const queryClient = useQueryClient()
 
     const isFollowing = useMemo(() => {
-        if(!props.user) return false;
-        return (currentUser?.following?.findIndex((el) => el?.id === props.user?.id) ?? -1) >= 0
-    }, [currentUser?.id, props.user])
+        if (!props.user) return false;
+        return (
+            (currentUser?.following?.findIndex(
+                (el) => el?.id === props.user?.id
+            ) ?? -1) >= 0
+        );
+    }, [currentUser?.following, props.user]);
 
     const handleFollowUser = useCallback(async() => {
         if(!props.user?.id) return;

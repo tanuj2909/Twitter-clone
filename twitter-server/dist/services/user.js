@@ -60,29 +60,53 @@ class UserService {
         });
     }
     static followUser(from, to) {
-        return db_1.db.follows.create({
-            data: {
-                follower: {
-                    connect: {
-                        id: from
-                    }
-                },
-                following: {
-                    connect: {
-                        id: to
+        return __awaiter(this, void 0, void 0, function* () {
+            const existingUser = yield db_1.db.follows.findUnique({
+                where: {
+                    followerId_followingId: {
+                        followerId: from,
+                        followingId: to
                     }
                 }
-            }
+            });
+            if (existingUser)
+                return { "data": { "followUser": true } };
+            return db_1.db.follows.create({
+                data: {
+                    follower: {
+                        connect: {
+                            id: from
+                        }
+                    },
+                    following: {
+                        connect: {
+                            id: to
+                        }
+                    }
+                }
+            });
         });
     }
     static unfollowUser(from, to) {
-        return db_1.db.follows.delete({
-            where: {
-                followerId_followingId: {
-                    followerId: from,
-                    followingId: to
+        return __awaiter(this, void 0, void 0, function* () {
+            const existingUser = yield db_1.db.follows.findUnique({
+                where: {
+                    followerId_followingId: {
+                        followerId: from,
+                        followingId: to
+                    }
                 }
-            }
+            });
+            if (!existingUser)
+                return { "data": { "unfollowUser": true } };
+            return db_1.db.follows.delete({
+                where: {
+                    followerId_followingId: {
+                        followerId: from,
+                        followingId: to
+                    }
+                }
+            });
         });
     }
 }
