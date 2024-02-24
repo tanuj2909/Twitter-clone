@@ -77,6 +77,38 @@ const extraResolvers = {
             })
 
             return result.map((e) => e.following)
+        },
+        recommendedUsers: async(parent: User, _: any, ctx: GraphqlContext) => {
+            if(!ctx.user) return [];
+
+            const myFollowing = await db.follows.findMany({
+                where: {
+                    follower: {
+                        id: ctx.user.id
+                    }
+                },
+                include: {
+                    following: {
+                        include: {
+                            followers: {
+                                include: {
+                                    following: true
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+
+            const users: User[] = [];
+
+            for(const followings of myFollowing) {
+                for(const followingOfFollowedUser of followings.following.followers) {
+                    users.push(followingOfFollowedUser.following)
+                }
+            }
+
+            return users;
         }
     }
 }

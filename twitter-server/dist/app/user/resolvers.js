@@ -78,6 +78,35 @@ const extraResolvers = {
                 }
             });
             return result.map((e) => e.following);
+        }),
+        recommendedUsers: (parent, _, ctx) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!ctx.user)
+                return [];
+            const myFollowing = yield db_1.db.follows.findMany({
+                where: {
+                    follower: {
+                        id: ctx.user.id
+                    }
+                },
+                include: {
+                    following: {
+                        include: {
+                            followers: {
+                                include: {
+                                    following: true
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            const users = [];
+            for (const followings of myFollowing) {
+                for (const followingOfFollowedUser of followings.following.followers) {
+                    users.push(followingOfFollowedUser.following);
+                }
+            }
+            return users;
         })
     }
 };

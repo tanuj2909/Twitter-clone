@@ -1,5 +1,4 @@
 import { useCurrentUser } from "@/hooks/user";
-import { useGetAllTweets } from "@/hooks/tweets";
 import TwitterLayout from "@/components/FeedCard/Layout/TwitterLayout";
 import TweetCard from "@/components/TweetCard";
 import FeedCard from "@/components/FeedCard";

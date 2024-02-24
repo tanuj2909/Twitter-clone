@@ -135,6 +135,13 @@ const TwitterLayout:React.FC<TwitterLayoutProps> = ( props ) => {
                 <GoogleLogin onSuccess={handelLoginWithGoogle}/>
                 </div>
             </div>}
+            {user && user.recommendedUsers  && <div className="m-5 p-5 bg-neutral-800 rounded-lg">
+                {user.recommendedUsers.map((el) => (
+                    <div key={el?.id}>
+                        {el?.firstName}
+                    </div>
+                ))}
+            </div>}
             </div>
         </div>
     </div>)
