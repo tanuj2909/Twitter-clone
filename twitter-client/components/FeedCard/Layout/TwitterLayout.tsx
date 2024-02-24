@@ -136,9 +136,25 @@ const TwitterLayout:React.FC<TwitterLayoutProps> = ( props ) => {
                 </div>
             </div>}
             {user && user.recommendedUsers  && <div className="m-5 p-5 bg-neutral-800 rounded-lg">
+                <div className=" text-neutral-300 font-semibold text-2xl mb-2">People you might know</div>
                 {user.recommendedUsers.map((el) => (
-                    <div key={el?.id}>
-                        {el?.firstName}
+                    <div key={el?.id} className="flex gap-4 text-lg p-4 font-semibold">
+                        {el?.profileImageUrl && <Image
+                            src={el.profileImageUrl}
+                            alt="recommended-user-image"
+                            className="rounded-full aspect-square"
+                            height={55}
+                            width={55}
+                        />}
+                        <div>
+                            <div>
+                                {el?.firstName} {el?.lastName}
+                            </div>
+                            <Link
+                                className=" bg-neutral-300 py-1 px-3 rounded-full text-neutral-800 font-semibold"
+                                href={`/${el?.id}`}
+                            >View</Link>
+                        </div>
                     </div>
                 ))}
             </div>}

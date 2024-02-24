@@ -82,6 +82,7 @@ const extraResolvers = {
             if(!ctx.user) return [];
 
             const myFollowing = await db.follows.findMany({
+                take: 5,
                 where: {
                     follower: {
                         id: ctx.user.id
@@ -104,7 +105,9 @@ const extraResolvers = {
 
             for(const followings of myFollowing) {
                 for(const followingOfFollowedUser of followings.following.followers) {
-                    users.push(followingOfFollowedUser.following)
+                    if(followingOfFollowedUser.following.id !== ctx.user.id && myFollowing.findIndex(e => e.followingId === followingOfFollowedUser.following.id) < 0) {
+                        users.push(followingOfFollowedUser.following)
+                    }
                 }
             }
 
