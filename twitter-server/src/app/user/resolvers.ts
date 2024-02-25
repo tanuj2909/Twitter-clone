@@ -2,6 +2,7 @@ import { db } from "../../lib/db";
 import { GraphqlContext } from "../../interfaces";
 import { User } from "@prisma/client";
 import UserService from "../../services/user";
+import { redisClient } from "../../lib/redis";
 
 
 
@@ -28,7 +29,7 @@ const mutations = {
         if(!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
 
         await UserService.followUser(ctx.user.id, to);
-
+        await redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
         return true;
     },
 
@@ -36,6 +37,7 @@ const mutations = {
         if(!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
 
         await UserService.unfollowUser(ctx.user.id, to);
+        await redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
         
         return true;
     }
@@ -81,6 +83,10 @@ const extraResolvers = {
         recommendedUsers: async(parent: User, _: any, ctx: GraphqlContext) => {
             if(!ctx.user) return [];
 
+            const cashedValue = await redisClient.get(`RECOMMENDED_USERS:${ctx.user.id}`);
+
+            if(cashedValue) return JSON.parse(cashedValue);
+
             const myFollowing = await db.follows.findMany({
                 take: 5,
                 where: {
@@ -110,6 +116,8 @@ const extraResolvers = {
                     }
                 }
             }
+
+            await redisClient.set(`RECOMMENDED_USERS:${ctx.user.id}`, JSON.stringify(users))
 
             return users;
         }

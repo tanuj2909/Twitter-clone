@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvers = void 0;
 const db_1 = require("../../lib/db");
 const user_1 = __importDefault(require("../../services/user"));
+const redis_1 = require("../../lib/redis");
 const queries = {
     verifyGoogleToken: (parent, { token }) => __awaiter(void 0, void 0, void 0, function* () {
         const resultToken = yield user_1.default.verifyGoogleAuthToken(token);
@@ -35,12 +36,14 @@ const mutations = {
         if (!ctx.user || !ctx.user.id)
             throw new Error("Unauthenticated");
         yield user_1.default.followUser(ctx.user.id, to);
+        yield redis_1.redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
         return true;
     }),
     unfollowUser: (parent, { to }, ctx) => __awaiter(void 0, void 0, void 0, function* () {
         if (!ctx.user || !ctx.user.id)
             throw new Error("Unauthenticated");
         yield user_1.default.unfollowUser(ctx.user.id, to);
+        yield redis_1.redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
         return true;
     })
 };
@@ -82,6 +85,9 @@ const extraResolvers = {
         recommendedUsers: (parent, _, ctx) => __awaiter(void 0, void 0, void 0, function* () {
             if (!ctx.user)
                 return [];
+            const cashedValue = yield redis_1.redisClient.get(`RECOMMENDED_USERS:${ctx.user.id}`);
+            if (cashedValue)
+                return JSON.parse(cashedValue);
             const myFollowing = yield db_1.db.follows.findMany({
                 take: 5,
                 where: {
@@ -109,6 +115,7 @@ const extraResolvers = {
                     }
                 }
             }
+            yield redis_1.redisClient.set(`RECOMMENDED_USERS:${ctx.user.id}`, JSON.stringify(users));
             return users;
         })
     }

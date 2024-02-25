@@ -17,6 +17,7 @@ const client_s3_1 = require("@aws-sdk/client-s3");
 const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
 const user_1 = __importDefault(require("../../services/user"));
 const tweet_1 = __importDefault(require("../../services/tweet"));
+const redis_1 = require("../../lib/redis");
 const s3Client = new client_s3_1.S3Client({
     region: process.env.AWS_DEFAULT_REGION,
 });
@@ -25,11 +26,20 @@ const mutations = {
         if (!ctx.user)
             throw new Error("You are not authenticated!");
         const tweet = yield tweet_1.default.createTweet(Object.assign(Object.assign({}, payload), { userId: ctx.user.id }));
+        yield redis_1.redisClient.del(`ALL_TWEETS`);
         return tweet;
     })
 };
 const queries = {
-    getAllTweets: () => __awaiter(void 0, void 0, void 0, function* () { return tweet_1.default.getAllTweets(); }),
+    getAllTweets: () => __awaiter(void 0, void 0, void 0, function* () {
+        const cashedTweets = yield redis_1.redisClient.get(``);
+        if (!cashedTweets) {
+            const tweets = yield tweet_1.default.getAllTweets();
+            yield redis_1.redisClient.set(`ALL_TWEETS`, JSON.stringify(tweets));
+            return tweets;
+        }
+        return JSON.parse(cashedTweets);
+    }),
     getSignedUrlForTweet: (parent, { imageType, imageName }, ctx) => __awaiter(void 0, void 0, void 0, function* () {
         if (!ctx.user || !ctx.user.id)
             throw new Error("Authentication Required!");
